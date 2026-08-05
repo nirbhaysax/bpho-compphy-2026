@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.constants as const
+from bpho_theme import apply_theme
+T = apply_theme()
 
 # ==========================================
 # PART 1: Planck's Black Body Radiation
@@ -22,18 +24,21 @@ def planck_spectrum(wavelength, T):
 wavelengths = np.linspace(100e-9, 3000e-9, 1000)
 temperatures_bb = [4000, 5000, 6000] # Temperatures in Kelvin
 
+colors = [T['ORANGE'], T['PINK'], T['ACCENT']]
+
 plt.figure(figsize=(10, 5))
 
-for T in temperatures_bb:
+for i, T in enumerate(temperatures_bb):
     radiance = planck_spectrum(wavelengths, T)
     # Convert wavelengths to nm for a cleaner x-axis
-    plt.plot(wavelengths * 1e9, radiance, label=f'T = {T} K')
+    plt.plot(wavelengths * 1e9, radiance, color=colors[i], label=f'T = {T} K')
 
 plt.title("Planck's Black Body Radiation Spectrum")
 plt.xlabel("Wavelength (nm)")
 plt.ylabel("Spectral Radiance (W/m$^3$/sr)")
 plt.legend()
 plt.grid(True)
+plt.tight_layout()
 plt.show()
 
 # ==========================================
@@ -62,17 +67,18 @@ temperatures_hc = np.linspace(10, 1000, 500)
 
 plt.figure(figsize=(10, 5))
 
-for crystal, theta in einstein_temps.items():
+for i, (crystal, theta) in enumerate(einstein_temps.items()):
     Cv = einstein_heat_capacity(temperatures_hc, theta)
-    plt.plot(temperatures_hc, Cv, label=f'{crystal} ($\\Theta_E$ = {theta} K)')
+    plt.plot(temperatures_hc, Cv, color=colors[i], label=f'{crystal} ($\\Theta_E$ = {theta} K)')
 
 # Plot the Dulong-Petit classic limit (3R) for comparison
 dulong_petit = 3 * const.R
-plt.axhline(y=dulong_petit, color='black', linestyle='--', label='Dulong-Petit Limit (3R)')
+plt.axhline(y=dulong_petit, color=T['DATA'], linestyle='--', label='Dulong-Petit Limit (3R)')
 
 plt.title("Einstein's Model of Molar Heat Capacity")
 plt.xlabel("Temperature (K)")
 plt.ylabel("Molar Heat Capacity $C_V$ (J/mol·K)")
 plt.legend()
 plt.grid(True)
+plt.tight_layout()
 plt.show()

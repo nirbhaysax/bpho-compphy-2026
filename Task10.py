@@ -1,101 +1,128 @@
+"""
+Task 10: Hydrogenic Orbitals 2D & 3D
+====================================
+Computes and visualizes the probability density |psi|^2 of hydrogenic atomic orbitals
+for given quantum numbers (n, l, m) using analytical wavefunctions and SciPy.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from scipy.special import genlaguerre as gen_laguerre, sph_harm
+from scipy.special import genlaguerre as gen_laguerre, sph_harm_y
 import scipy.constants as const
 
-# ==========================================
-# TASK 10: Hydrogenic Orbitals Visualizer
-# ==========================================
+from bpho_theme import apply_theme
+T = apply_theme()
 
-# Quantum numbers for the target orbital (e.g., n=3, l=2, m=-2 -> 3dxy-like)
-n = 3
-l = 2
-m = -2
-Z = 1  # Atomic number for Hydrogen
 
-# Constants and Bohr radius (meters)
-a_0 = 5.29177e-11 
+def radial_wavefunction(n, l, r, Z=1.0):
+    """Compute the radial part R_{n,l}(r) of the hydrogenic wavefunction."""
+    a0 = const.physical_constants['Bohr radius'][0] * 1e10  # Bohr radius in Angstroms
+    rho = (2.0 * Z * r) / (n * a0)
 
-def radial_wavefunction(n, l, r, Z):
-    """Calculates the radial part R_nl(r) of the hydrogenic wavefunction."""
-    rho = (2.0 * Z * r) / (n * a_0)
     # Normalization constant
-    factor = np.sqrt((2.0 * Z / (n * a_0))**3 * math.factorial(n - l - 1) / (2.0 * n * math.factorial(n + l)))
+    prefactor = np.sqrt(
+        (2.0 * Z / (n * a0))**3 *
+        math.factorial(n - l - 1) /
+        (2.0 * n * math.factorial(n + l))
+    )
+
     # Associated Laguerre polynomial L_{n-l-1}^{2l+1}(rho)
     laguerre = gen_laguerre(n - l - 1, 2 * l + 1)(rho)
-    return factor * (rho**l) * np.exp(-rho / 2.0) * laguerre
 
-def hydrogen_wavefunction(n, l, m, x, y, z):
-    """Calculates the complex spatial wavefunction psi(x, y, z).'"""
+    R = prefactor * (rho ** l) * np.exp(-rho / 2.0) * laguerre
+    return R
+
+
+def wavefunction(n, l, m, x, y, z, Z=1.0):
+    """Compute the full wavefunction psi_{n,l,m}(x, y, z)."""
     r = np.sqrt(x**2 + y**2 + z**2)
     # Avoid division by zero at origin
-    r = np.where(r == 0, 1e-15, r)
-    
-    # Polar angles (theta: colatitude, phi: azimuth)
-    theta = np.arccos(z / r)
+    r_safe = np.where(r == 0.0, 1e-12, r)
+
+    # Polar angle (colatitude) theta in [0, pi]
+    theta = np.arccos(np.clip(z / r_safe, -1.0, 1.0))
+    # Azimuthal angle phi in [0, 2pi]
     phi = np.arctan2(y, x)
-    
-    R = radial_wavefunction(n, l, r, Z)
-    # scipy sph_harm signature: sph_harm(m, l, phi, theta)
-    Y = sph_harm(m, l, phi, theta)
-    
-    return R * Y
 
-# Setup coordinate grid (in Angstroms, converted to meters for calculation)
-lim_angstroms = 8.0
-grid_points = 150
-x_ang = np.linspace(-lim_angstroms, lim_angstroms, grid_points)
-y_ang = np.linspace(-lim_angstroms, lim_angstroms, grid_points)
-X, Y = np.meshgrid(x_ang, y_ang)
+    R = radial_wavefunction(n, l, r_safe, Z)
 
-X_m = X * 1e-10
-Y_m = Y * 1e-10
-Z_m = np.zeros_like(X_m)  # z = 0 plane slice
+    # sph_harm_y(l, m, theta, phi): l=degree, m=order, theta=colatitude, phi=azimuthal
+    Y = sph_harm_y(l, m, theta, phi)
 
-# Calculate wavefunction and probability density for 2D slice
-psi_2d = hydrogen_wavefunction(n, l, m, X_m, Y_m, Z_m)
-prob_density_2d = np.abs(psi_2d)**2
+    psi = R * Y
+    return psi
 
-# ==========================================
-# Plotting the Results
-# ==========================================
-fig = plt.figure(figsize=(14, 6))
 
-# Panel 1: 2D Probability Density Slice (z = 0 plane)
-ax1 = fig.add_subplot(121)
-im = ax1.imshow(prob_density_2d, extent=[-lim_angstroms, lim_angstroms, -lim_angstroms, lim_angstroms], 
-                origin='lower', cmap='jet')
-ax1.set_title(f"z = 0 plane | Z={Z} | n={n}, l={l}, m={m}", fontweight='bold')
-ax1.set_xlabel("x / Angstroms")
-ax1.set_ylabel("y / Angstroms")
-fig.colorbar(im, ax=ax1, label="Probability Density")
+def main():
+    n, l, m = 3, 2, -2
+    Z = 1.0
 
-# Panel 2: 3D Volumetric Probability Cloud via 3D Scatter
-ax2 = fig.add_subplot(122, projection='3d')
+    print(f"Calculating Hydrogenic Orbital for n={n}, l={l}, m={m}, Z={Z}...")
 
-# Generate a 3D spatial grid for the volumetric plot
-lim_3d = 6.0
-pts_3d = 40
-x_3d = np.linspace(-lim_3d, lim_3d, pts_3d)
-y_3d = np.linspace(-lim_3d, lim_3d, pts_3d)
-z_3d = np.linspace(-lim_3d, lim_3d, pts_3d)
-X3, Y3, Z3 = np.meshgrid(x_3d, y_3d, z_3d)
+    # ── 2D slice (z = 0 plane) ─────────────────────────────────
+    lim = 12.0
+    resolution_2d = 250
+    x = np.linspace(-lim, lim, resolution_2d)
+    y = np.linspace(-lim, lim, resolution_2d)
+    X2, Y2 = np.meshgrid(x, y)
+    Z2 = np.zeros_like(X2)
 
-# Convert to meters
-psi_3d = hydrogen_wavefunction(n, l, m, X3 * 1e-10, Y3 * 1e-10, Z3 * 1e-10)
-prob_3d = np.abs(psi_3d)**2
+    psi_2d = wavefunction(n, l, m, X2, Y2, Z2, Z)
+    prob_2d = np.abs(psi_2d)**2
 
-# Filter points above a threshold to display the orbital shape cleanly
-threshold = 0.05 * np.max(prob_3d)
-mask = prob_3d > threshold
+    # ── 3D volumetric grid (coarser for performance) ────────────
+    res_3d = 28
+    x3 = np.linspace(-lim, lim, res_3d)
+    y3 = np.linspace(-lim, lim, res_3d)
+    z3 = np.linspace(-lim, lim, res_3d)
+    X3, Y3, Z3 = np.meshgrid(x3, y3, z3, indexing='ij')
 
-sc = ax2.scatter(X3[mask], Y3[mask], Z3[mask], c=prob_3d[mask], cmap='jet', marker='o', s=15, alpha=0.6)
-ax2.set_title(f"3D Orbital Visualization (n={n}, l={l}, m={m})", fontweight='bold')
-ax2.set_xlabel("x in Angstroms")
-ax2.set_ylabel("y in Angstroms")
-ax2.set_zlabel("z in Angstroms")
-fig.colorbar(sc, ax=ax2, shrink=0.6, label="Probability Density")
+    psi_3d = wavefunction(n, l, m, X3, Y3, Z3, Z)
+    prob_3d = np.abs(psi_3d)**2
 
-plt.tight_layout()
-plt.show()
+    # Keep only high-probability points to reveal orbital shape
+    threshold = np.max(prob_3d) * 0.05
+    mask = prob_3d > threshold
+
+    x_pts = X3[mask]
+    y_pts = Y3[mask]
+    z_pts = Z3[mask]
+    c_pts = prob_3d[mask]
+
+    n_visible = x_pts.size
+    print(f"  3D points after filtering: {n_visible} / {X3.size} ({100 * n_visible / X3.size:.1f}%)")
+
+    # ── Plotting ───────────────────────────────────────────────
+    fig = plt.figure(figsize=(14, 7))
+
+    # Panel 1: 2D probability density slice
+    ax1 = fig.add_subplot(121)
+    im = ax1.imshow(prob_2d, extent=[-lim, lim, -lim, lim],
+                    origin='lower', cmap='plasma')
+    ax1.set_title(f"z = 0 plane | Z={Z} | n={n}, l={l}, m={m}",
+                  fontsize=12, fontweight='bold')
+    ax1.set_xlabel("x / Angstroms")
+    ax1.set_ylabel("y / Angstroms")
+    cbar1 = fig.colorbar(im, ax=ax1, fraction=0.046, pad=0.04)
+    cbar1.set_label("Probability Density")
+
+    # Panel 2: 3D scatter
+    ax2 = fig.add_subplot(122, projection='3d')
+    sc = ax2.scatter(x_pts, y_pts, z_pts, c=c_pts, cmap='plasma',
+                     marker='o', s=8, alpha=0.7,
+                     edgecolors='none', linewidth=0)
+    ax2.set_title(f"3D Orbital (n={n}, l={l}, m={m})",
+                  fontsize=12, fontweight='bold')
+    ax2.set_xlabel("x / Angstroms")
+    ax2.set_ylabel("y / Angstroms")
+    ax2.set_zlabel("z / Angstroms")
+    cbar2 = fig.colorbar(sc, ax=ax2, fraction=0.046, pad=0.04, shrink=0.7)
+    cbar2.set_label("Probability Density")
+
+    plt.tight_layout()
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()

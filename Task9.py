@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.constants as const
 
+from bpho_theme import apply_theme
+T = apply_theme()
+
 # ==========================================
 # TASK 9: Compton Scattering Model
 # ==========================================
@@ -51,23 +54,23 @@ phi_deg = np.rad2deg(phi_rad)
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16, 5))
 
 # Panel 1: Fractional Wavelength Shift vs Theta
-ax1.plot(theta_deg, fractional_shift, color='blue', linewidth=2.5)
+ax1.plot(theta_deg, fractional_shift, color=T['DATA'], linewidth=2.5)
 ax1.set_title("Fractional Wavelength Shift", fontweight='bold')
 ax1.set_xlabel(r"Photon Scattering Angle $\theta$ (degrees)")
 ax1.set_ylabel(r"$\Delta\lambda / \lambda$")
 ax1.grid(True, linestyle='--', alpha=0.5)
 
 # Panel 2: Electron Recoil Speed vs Theta
-ax2.plot(theta_deg, v_over_c, color='red', linewidth=2.5)
+ax2.plot(theta_deg, v_over_c, color=T['PINK'], linewidth=2.5)
 ax2.set_title("Electron Recoil Speed", fontweight='bold')
 ax2.set_xlabel(r"Photon Scattering Angle $\theta$ (degrees)")
 ax2.set_ylabel("Speed ($v/c$)")
 ax2.grid(True, linestyle='--', alpha=0.5)
 
 # Panel 3: Electron Recoil Angle vs Theta
-ax3.plot(theta_deg, phi_deg, color='green', linewidth=2.5)
+ax3.plot(theta_deg, phi_deg, color=T['ACCENT'], linewidth=2.5)
 ax3.set_title("Electron Recoil Angle $\\phi$", fontweight='bold')
-ax3.set_xlabel("Photon Scattering Angle $\theta$ (degrees)")
+ax3.set_xlabel(r"Photon Scattering Angle $\theta$ (degrees)")
 ax3.set_ylabel(r"Recoil Angle $\phi$ (degrees)")
 ax3.grid(True, linestyle='--', alpha=0.5)
 

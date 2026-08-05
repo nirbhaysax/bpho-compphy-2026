@@ -3,6 +3,11 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 import scipy.constants as const
 
+plt.style.use('dark_background')
+
+G_ACCENT = '#00ff41'
+G_ORANGE = '#ff9100'
+
 # ==========================================
 # TASK 6: Electron Diffraction App
 # ==========================================
@@ -72,12 +77,12 @@ inv_sqrt_V_range = 1 / np.sqrt(V_range)
 sin_half_phi1_range = (h / np.sqrt(2 * m_e * e * V_range)) / (2 * d1)
 sin_half_phi2_range = (h / np.sqrt(2 * m_e * e * V_range)) / (2 * d2)
 
-ax_graph.plot(sin_half_phi1_range, inv_sqrt_V_range, color='cyan', label='d = 0.123 nm')
-ax_graph.plot(sin_half_phi2_range, inv_sqrt_V_range, color='magenta', label='d = 0.213 nm')
+ax_graph.plot(sin_half_phi1_range, inv_sqrt_V_range, color='#33ff33', label='d = 0.123 nm')
+ax_graph.plot(sin_half_phi2_range, inv_sqrt_V_range, color='#ff6ec7', label='d = 0.213 nm')
 
 # Scatter points to track current voltage on the graph
-point1, = ax_graph.plot([], [], 'co', markersize=8)
-point2, = ax_graph.plot([], [], 'mo', markersize=8)
+point1, = ax_graph.plot([], [], 'o', color='#33ff41', markersize=8)
+point2, = ax_graph.plot([], [], 'o', color='#ff6ec7', markersize=8)
 
 ax_graph.set_title(r"Verification: $1/\sqrt{V}$ vs $\sin(\frac{1}{2}\phi)$", fontweight='bold')
 ax_graph.set_xlabel(r"$\sin(\frac{1}{2}\phi)$")
@@ -88,7 +93,7 @@ ax_graph.grid(True, linestyle='--', alpha=0.6)
 # ------------------------------------------
 # Interactive Slider Setup
 # ------------------------------------------
-ax_slider = plt.axes([0.2, 0.1, 0.6, 0.04], facecolor='lightgray')
+ax_slider = plt.axes([0.2, 0.1, 0.6, 0.04], facecolor='#2a2a2a')
 voltage_slider = Slider(
     ax=ax_slider,
     label='Accelerating Voltage (V)',
@@ -96,7 +101,7 @@ voltage_slider = Slider(
     valmax=5000,
     valinit=3000,
     valstep=50,
-    color='lime'
+    color='#00ff41'
 )
 
 def update(val):
@@ -118,4 +123,5 @@ def update(val):
 update(3000)
 
 voltage_slider.on_changed(update)
+plt.tight_layout()
 plt.show()
