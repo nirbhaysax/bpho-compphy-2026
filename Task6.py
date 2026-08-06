@@ -121,5 +121,4 @@ def update(val):
 update(3000)
 
 voltage_slider.on_changed(update)
-plt.tight_layout()
 plt.show()

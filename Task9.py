@@ -43,8 +43,9 @@ v_over_c = np.sqrt(1 - (1 / gamma**2))
 # 3. Electron Recoil Angle (phi)
 # denominator = (lambda_prime / lambda_init) - cos(theta); can be zero at theta=0
 denom = (lambda_prime / lambda_init) - np.cos(theta_rad)
-# Use np.where to avoid division by zero at theta=0 (where denom=0, phi -> pi/2)
-tan_phi = np.where(np.abs(denom) < 1e-15, np.inf, np.sin(theta_rad) / denom)
+# Use np.where + errstate to avoid division by zero at theta=0
+with np.errstate(divide='ignore', invalid='ignore'):
+    tan_phi = np.where(np.abs(denom) < 1e-15, np.inf, np.sin(theta_rad) / denom)
 phi_rad = np.arctan(tan_phi)
 phi_deg = np.rad2deg(phi_rad)
 

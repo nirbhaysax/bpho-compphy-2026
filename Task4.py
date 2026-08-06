@@ -119,5 +119,4 @@ def update(val):
 
 phi_slider.on_changed(update)
 
-plt.tight_layout()
 plt.show()
