@@ -3,10 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 import scipy.constants as const
 
-plt.style.use('dark_background')
-
-G_ACCENT = '#00ff41'
-G_ORANGE = '#ff9100'
+from bpho_theme import apply_theme
+CMAP = apply_theme()
 
 # ==========================================
 # TASK 6: Electron Diffraction App
@@ -55,7 +53,7 @@ ax_screen.set_facecolor('black')
 ax_screen.set_xlim(-0.06, 0.06)
 ax_screen.set_ylim(-0.06, 0.06)
 ax_screen.set_aspect('equal')
-ax_screen.set_title("Phosphor Screen ('Electron Wave' Rings)", color='green', fontweight='bold')
+ax_screen.set_title("Phosphor Screen ('Electron Wave' Rings)", color=CMAP['ACCENT'], fontweight='bold')
 ax_screen.axis('off')
 
 # Central beam glow
@@ -64,8 +62,8 @@ ax_screen.plot(0.002 * np.cos(theta), 0.002 * np.sin(theta), color='white', line
 ax_screen.fill(0.002 * np.cos(theta), 0.002 * np.sin(theta), color='white')
 
 # Initialize the rings
-ring1, = ax_screen.plot([], [], color='lime', linewidth=2.5, alpha=0.8)
-ring2, = ax_screen.plot([], [], color='lime', linewidth=2.5, alpha=0.8)
+ring1, = ax_screen.plot([], [], color=CMAP['ACCENT'], linewidth=2.5, alpha=0.8)
+ring2, = ax_screen.plot([], [], color=CMAP['ACCENT'], linewidth=2.5, alpha=0.8)
 
 # ------------------------------------------
 # Panel 2: 1/sqrt(V) vs sin(phi/2) Graph
@@ -77,12 +75,12 @@ inv_sqrt_V_range = 1 / np.sqrt(V_range)
 sin_half_phi1_range = (h / np.sqrt(2 * m_e * e * V_range)) / (2 * d1)
 sin_half_phi2_range = (h / np.sqrt(2 * m_e * e * V_range)) / (2 * d2)
 
-ax_graph.plot(sin_half_phi1_range, inv_sqrt_V_range, color='#33ff33', label='d = 0.123 nm')
-ax_graph.plot(sin_half_phi2_range, inv_sqrt_V_range, color='#ff6ec7', label='d = 0.213 nm')
+ax_graph.plot(sin_half_phi1_range, inv_sqrt_V_range, color=CMAP['DATA'], label='d = 0.123 nm')
+ax_graph.plot(sin_half_phi2_range, inv_sqrt_V_range, color=CMAP['PINK'], label='d = 0.213 nm')
 
 # Scatter points to track current voltage on the graph
-point1, = ax_graph.plot([], [], 'o', color='#33ff41', markersize=8)
-point2, = ax_graph.plot([], [], 'o', color='#ff6ec7', markersize=8)
+point1, = ax_graph.plot([], [], 'o', color=CMAP['ACCENT'], markersize=8)
+point2, = ax_graph.plot([], [], 'o', color=CMAP['PINK'], markersize=8)
 
 ax_graph.set_title(r"Verification: $1/\sqrt{V}$ vs $\sin(\frac{1}{2}\phi)$", fontweight='bold')
 ax_graph.set_xlabel(r"$\sin(\frac{1}{2}\phi)$")
@@ -101,7 +99,7 @@ voltage_slider = Slider(
     valmax=5000,
     valinit=3000,
     valstep=50,
-    color='#00ff41'
+    color=CMAP['ACCENT']
 )
 
 def update(val):

@@ -1,13 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-plt.style.use('dark_background')
-
-G_ACCENT = '#00ff41'
-GREEN   = '#33ff33'
-G_PINK   = '#ff6ec7'
-G_ORANGE = '#ff9100'
-WHITE    = '#ffffff'
+from bpho_theme import apply_theme
+T = apply_theme()
 
 # ==========================================
 # TASK 5: Bohr Model Hydrogen Emission Spectrum
@@ -19,11 +14,11 @@ hc = 1239.84193  # Planck's constant * speed of light in eV*nm
 
 # Dictionary mapping the series name to its final energy level (n_f) and plot color
 series_map = {
-    'Lyman': (1, GREEN),
-    'Balmer': (2, G_PINK),
-    'Paschen': (3, G_ACCENT),
-    'Brackett': (4, G_ORANGE),
-    'Pfund': (5, WHITE)
+    'Lyman': (1, T['DATA']),
+    'Balmer': (2, T['PINK']),
+    'Paschen': (3, T['ACCENT']),
+    'Brackett': (4, T['ORANGE']),
+    'Pfund': (5, T['DATA'])
 }
 
 plt.figure(figsize=(10, 6))
@@ -31,7 +26,7 @@ plt.figure(figsize=(10, 6))
 # Plot a faint background curve showing the inverse E = hc/lambda relationship
 lambdas_curve = np.linspace(90, 8000, 1000)
 energies_curve = hc / lambdas_curve
-plt.plot(lambdas_curve, energies_curve, color='#444444', linestyle='--', zorder=1)
+plt.plot(lambdas_curve, energies_curve, color=T['MUTED'], linestyle='--', zorder=1)
 
 # Calculate and plot the transitions for each series
 max_ni = 30  # Calculate up to n=30 to show the series limit clustering

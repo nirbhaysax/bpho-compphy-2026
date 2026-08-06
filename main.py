@@ -138,7 +138,7 @@ class BPhOLauncher(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
         # Load saved theme or default to Grayscale Standard
-        initial_theme = "Grayscale Standard"
+        initial_theme = "Midnight Obsidian"
         if os.path.exists(CONFIG_PATH):
             try:
                 with open(CONFIG_PATH, "r") as f:

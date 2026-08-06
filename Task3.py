@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.constants as const
 from bpho_theme import apply_theme
-T = apply_theme()
+CMAP = apply_theme()
 
 # ==========================================
 # PART 1: Planck's Black Body Radiation
@@ -24,7 +24,7 @@ def planck_spectrum(wavelength, T):
 wavelengths = np.linspace(100e-9, 3000e-9, 1000)
 temperatures_bb = [4000, 5000, 6000] # Temperatures in Kelvin
 
-colors = [T['ORANGE'], T['PINK'], T['ACCENT']]
+colors = [CMAP['ORANGE'], CMAP['PINK'], CMAP['ACCENT']]
 
 plt.figure(figsize=(10, 5))
 
@@ -73,7 +73,7 @@ for i, (crystal, theta) in enumerate(einstein_temps.items()):
 
 # Plot the Dulong-Petit classic limit (3R) for comparison
 dulong_petit = 3 * const.R
-plt.axhline(y=dulong_petit, color=T['DATA'], linestyle='--', label='Dulong-Petit Limit (3R)')
+plt.axhline(y=dulong_petit, color=CMAP['DATA'], linestyle='--', label='Dulong-Petit Limit (3R)')
 
 plt.title("Einstein's Model of Molar Heat Capacity")
 plt.xlabel("Temperature (K)")
